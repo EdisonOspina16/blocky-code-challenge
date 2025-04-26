@@ -12,7 +12,6 @@ This file contains the Block class, the main data structure used in the game.
 """
 from typing import Optional, Tuple, List
 import random
-import math
 from renderer import COLOUR_LIST, TEMPTING_TURQUOISE, BLACK, colour_name
 
 
@@ -74,18 +73,21 @@ class Block:
 
     def __init__(self, level: int,
                  colour: Optional[Tuple[int, int, int]] = None,
-                 children: Optional[List['Block']] = None) -> None:
+                 children: Optional[List['Block']] = None,
+                 position: Tuple[int, int] = (0, 0),
+                 size: int = 100) -> None:
+
         """Initialize this Block to be an unhighlighted root block with
         no parent.
 
-        If <children> is None, give this block no children.  Otherwise
+        If <children> is None, give this block no children. Otherwise
         give it the provided children.  Use the provided level and colour,
         and set everything else (x and y coordinates, size,
         and max_depth) to 0.  (All attributes can be updated later, as
         appropriate.)
         """
-        self.position = (0,0)
-        self.size = 0
+        self.position = position
+        self.size = size
         self.level = level
         self.max_depth = 0
         self.highlighted = False
@@ -99,9 +101,9 @@ class Block:
                 child.level = level +1
                 child.max_depth = self.max_depth
 
-            else:
-                self.children = []
-                self.colour = colour
+        else:                     #el else debe ir alineado con el if
+            self.children = []
+            self.colour = colour
 
     def rectangles_to_draw(self) -> List[Tuple[Tuple[int, int, int],
                                                Tuple[int, int],
@@ -166,8 +168,24 @@ class Block:
         """
         pass
 
-    def update_block_locations(self, top_left: Tuple[int, int],
-                               size: int) -> None:
+    def update_block_locations(self, top_left: Tuple[int, int], size: int) -> None:
+        self.position = top_left
+        self.size = size
+
+        if self.children:
+            x, y = top_left
+            child_size = size // 2
+
+            positions = [
+                (x + child_size, y),  # upper-right
+                (x, y),  # upper-left
+                (x, y + child_size),  # lower-left
+                (x + child_size, y + child_size)  # lower-right
+            ]
+
+            for i in range(4):
+                self.children[i].update_block_locations(positions[i], child_size)
+
         """
         Update the position and size of each of the Blocks within this Block.
 
@@ -177,26 +195,46 @@ class Block:
         <top_left> is the (x, y) coordinates of the top left corner of
         this Block.  <size> is the height and width of this Block.
         """
-        pass
 
-    def get_selected_block(self, location: Tuple[int, int], level: int) \
-            -> 'Block':
-        """Return the Block within this Block that includes the given location
-        and is at the given level. If the level specified is lower than
-        the lowest block at the specified location, then return the block
-        at the location with the closest level value.
+    def get_selected_block(self, location: Tuple[int, int], level: int) -> 'Block':
 
-        <location> is the (x, y) coordinates of the location on the window
-        whose corresponding block is to be returned.
-        <level> is the level of the desired Block.  Note that
-        if a Block includes the location (x, y), and that Block is subdivided,
-        then one of its four children will contain the location (x, y) also;
-        this is why <level> is needed.
+        #desempaquetamos la ubicacion
+        x, y = location
 
-        Preconditions:
-        - 0 <= level <= max_depth
-        """
-        pass
+        #Verificar si la ubicación está dentro de los límites del bloque actual
+        x_min, y_min = self.position  # Esquina superior izquierda
+        x_max = x_min + self.size  # Esquina inferior derecha en el eje X
+        y_max = y_min + self.size  # Esquina inferior derecha en el eje Y
+
+        if not(x_min <= x < x_max and y_min <= y < y_max):
+            raise ValueError("la ubicacion esta fuera de los limites")
+
+        # Si estamos en el nivel 0, devolvemos el bloque actual
+        if level == self.level:
+            return self
+
+        if self.children:
+            for sub_block in self.children:
+                result = sub_block.get_selected_block(location, level)
+                if result:
+                    return result
+        return None
+
+    """Return the Block within this Block that includes the given location
+            and is at the given level. If the level specified is lower than
+            the lowest block at the specified location, then return the block
+            at the location with the closest level value.
+
+            <location> is the (x, y) coordinates of the location on the window
+            whose corresponding block is to be returned.
+            <level> is the level of the desired Block.  Note that
+            if a Block includes the location (x, y), and that Block is subdivided,
+            then one of its four children will contain the location (x, y) also;
+            this is why <level> is needed.
+
+            Preconditions:
+            - 0 <= level <= max_depth
+            """
 
     def flatten(self) -> List[List[Tuple[int, int, int]]]:
         """Return a two-dimensional list representing this Block as rows
@@ -329,7 +367,7 @@ if __name__ == '__main__':
     # value (3 in this case).
     b2 = random_init(0, 3)
     # Now we update position and size throughout the tree.
-    b2.update_block_locations((0, 0), 750)
+    #b2.update_block_locations((0, 0), 750)
     print("\n=== random tree ===")
     # All attributes should have sensible values when we print this tree.
     print_block(b2, True)
