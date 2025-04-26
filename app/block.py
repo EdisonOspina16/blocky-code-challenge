@@ -169,7 +169,7 @@ class Block:
         pass
 
     def update_block_locations(self, top_left: Tuple[int, int], size: int) -> None:
-        self.position = top_left
+        self.position = top_left  #Actualizamos la posicion y bloque actual
         self.size = size
 
         if self.children:
@@ -196,28 +196,29 @@ class Block:
         this Block.  <size> is the height and width of this Block.
         """
 
-    def get_selected_block(self, location: Tuple[int, int], level: int) -> 'Block':
-
-        #desempaquetamos la ubicacion
+    def get_selected_block(self, location: Tuple[int, int], level: int) -> Optional['Block']:
+        """
+        Returns the block at the specified location and level, or raises an error
+        if the location is outside the limits of the block.
+        """
         x, y = location
 
-        #Verificar si la ubicación está dentro de los límites del bloque actual
-        x_min, y_min = self.position  # Esquina superior izquierda
-        x_max = x_min + self.size  # Esquina inferior derecha en el eje X
-        y_max = y_min + self.size  # Esquina inferior derecha en el eje Y
+        # Verificar si la ubicación está dentro de los límites del bloque actual
+        if not (self.position[0] <= x < self.position[0] + self.size and
+                self.position[1] <= y < self.position[1] + self.size):
+            raise ValueError("la ubicación está fuera de los límites")
 
-        if not(x_min <= x < x_max and y_min <= y < y_max):
-            raise ValueError("la ubicacion esta fuera de los limites")
-
-        # Si estamos en el nivel 0, devolvemos el bloque actual
+        # Si el nivel coincide, devolver este bloque
         if level == self.level:
             return self
 
-        if self.children:
-            for sub_block in self.children:
-                result = sub_block.get_selected_block(location, level)
-                if result:
-                    return result
+        # Buscar en los sub-bloques si no es el nivel adecuado
+        for sub_block in self.children:
+            result = sub_block.get_selected_block(location, level)
+            if result:
+                return result
+
+        # Si no se encuentra el bloque, devolver None
         return None
 
     """Return the Block within this Block that includes the given location
