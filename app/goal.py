@@ -82,3 +82,7 @@ if __name__ == '__main__':
         ],
         'max-attributes': 15
     })
+
+
+class PerimeterGoal:
+    pass

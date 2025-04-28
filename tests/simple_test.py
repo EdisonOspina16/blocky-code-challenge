@@ -341,4 +341,4 @@ def construct_board() -> Tuple[Block, List[List[Tuple[int, int, int]]]]:
 
 if __name__ == '__main__':
     import pytest
-    pytest.main(['simple_test.py'])
+    pytest.main(['tests/simple_test.py'])

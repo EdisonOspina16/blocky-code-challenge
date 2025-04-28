@@ -250,7 +250,33 @@ class Block:
 
         L[0][0] represents the unit cell in the upper left corner of the Block.
         """
-        pass
+        if not self.children:
+            # Caso hoja: Devolver una matriz llena con el color de este bloque
+            size = 2 ** (self.max_depth - self.level)
+            return [[self.colour] * size for _ in range(size)]
+        else:
+            # Caso subdividido: Combinar los flatten de los 4 hijos
+            flattened_children = [child.flatten() for child in self.children]
+
+            # Partes: hijos son [upper_left, upper_right, lower_left, lower_right]
+            upper_left = flattened_children[0]
+            upper_right = flattened_children[1]
+            lower_left = flattened_children[2]
+            lower_right = flattened_children[3]
+
+            # Concatenar las filas para formar la parte superior e inferior
+            top = []
+            bottom = []
+
+            for ul_row, ur_row in zip (lower_left, lower_right):
+                top.append(ul_row + ur_row)
+
+            for ll_row, lr_row in zip (lower_left,lower_right):
+                bottom.append(ll_row + lr_row)
+
+            # Juntar
+            return top + bottom
+
 
 
 def random_init(level: int, max_depth: int) -> 'Block':
