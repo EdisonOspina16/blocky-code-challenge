@@ -1,5 +1,5 @@
-from block import Block
-from renderer import COLOUR_LIST
+from app.block import Block
+from app.renderer import COLOUR_LIST
 
 def test_rectangles_to_draw():
     """

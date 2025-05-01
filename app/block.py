@@ -151,7 +151,15 @@ class Block:
         If <direction> is 1, rotate clockwise.  If <direction> is 3, rotate
         counterclockwise. If this Block has no children, do nothing.
         """
-        pass
+        if len(self.children) != 4:
+            return
+        if direction == 1:
+            self.children = [self.children[1], self.children[2], self.children[3], self.children[0]]
+        elif direction == 3:
+            self.children = [self.children[3], self.children[0], self.children[1], self.children[2]]
+        for child in self.children:
+            child.rotate(direction)
+        self.update_block_locations(self.position, self.size)
 
     def smash(self) -> bool:
         """Smash this block.
@@ -166,7 +174,15 @@ class Block:
 
         Return True if this Block was smashed and False otherwise.
         """
-        pass
+        if self.level == 0 or self.level == self.max_depth:
+            return False
+        self.children = [random_init(self.level + 1, self.max_depth) for _ in range(4)]
+        for child in self.children:
+            child.parent = self
+        self.colour = None
+        self.update_block_locations(self.position, self.size)
+        return True
+
 
     def update_block_locations(self, top_left: Tuple[int, int], size: int) -> None:
         self.position = top_left  #Actualizamos la posicion y bloque actual

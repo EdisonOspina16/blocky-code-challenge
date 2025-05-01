@@ -14,9 +14,9 @@ This file contains the player class hierarchy.
 import random
 from typing import Optional
 import pygame
-from renderer import Renderer
-from block import Block
-from goal import Goal
+from app.renderer import Renderer
+from app.block import Block
+from app.goal import Goal
 
 TIME_DELAY = 600
 
