@@ -210,3 +210,7 @@ if __name__ == '__main__':
         'max-attributes': 10,
         'generated-members': 'pygame.*'
     })
+
+
+class RandomPlayer:
+    pass

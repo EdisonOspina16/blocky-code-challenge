@@ -12,7 +12,7 @@ This file contains the Block class, the main data structure used in the game.
 """
 from typing import Optional, Tuple, List
 import random
-from renderer import COLOUR_LIST, TEMPTING_TURQUOISE, BLACK, colour_name
+from app.renderer import COLOUR_LIST, TEMPTING_TURQUOISE, BLACK, colour_name
 
 
 HIGHLIGHT_COLOUR = TEMPTING_TURQUOISE
@@ -101,7 +101,7 @@ class Block:
                 child.level = level +1
                 child.max_depth = self.max_depth
 
-        else:                     #el else debe ir alineado con el if
+        else:
             self.children = []
             self.colour = colour
 

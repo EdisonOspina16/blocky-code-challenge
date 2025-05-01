@@ -16,10 +16,10 @@ can call to try playing the game in several different configurations.
 """
 import random
 from typing import List
-from block import Block, random_init
+from app.block import Block, random_init
 from goal import BlobGoal, PerimeterGoal
-from player import Player, HumanPlayer, RandomPlayer, SmartPlayer
-from renderer import Renderer, COLOUR_LIST, colour_name, BOARD_WIDTH
+from app.player import Player, HumanPlayer, RandomPlayer, SmartPlayer
+from app.renderer import Renderer, COLOUR_LIST, colour_name, BOARD_WIDTH
 
 
 class Game:
