@@ -212,30 +212,32 @@ class Block:
         this Block.  <size> is the height and width of this Block.
         """
 
-    def get_selected_block(self, location: Tuple[int, int], level: int) -> Optional['Block']:
+    def get_selected_block(self, location: Tuple[int, int], level: int) -> "Block":
         """
         Returns the block at the specified location and level, or raises an error
         if the location is outside the limits of the block.
         """
         x, y = location
 
-        # Verificar si la ubicación está dentro de los límites del bloque actual
+        # Verificar si la ubicación (x, y) está dentro de los límites del bloque actual.
         if not (self.position[0] <= x < self.position[0] + self.size and
                 self.position[1] <= y < self.position[1] + self.size):
-            raise ValueError("la ubicación está fuera de los límites")
-
-        # Si el nivel coincide, devolver este bloque
-        if level == self.level:
             return self
 
-        # Buscar en los sub-bloques si no es el nivel adecuado
-        for sub_block in self.children:
-            result = sub_block.get_selected_block(location, level)
-            if result:
-                return result
+        # Si estamos en el nivel deseado o no hay hijos, retornar este bloque
+        if self.level == level or not self.children:
+            return self
 
-        # Si no se encuentra el bloque, devolver None
-        return None
+        # Buscar entre los sub-bloques
+        for child in self.children:
+            # Verificar si (x, y) está dentro de los límites del hijo actual
+            if (child.position[0] <= x < child.position[0] + child.size and
+                    child.position[1] <= y < child.position[1] + child.size):
+                # Llamada recursiva sobre el hijo que contiene el punto
+                return child.get_selected_block(location, level)
+
+        # Si no se encuentra un hijo que contenga la ubicación, retornar este bloque
+        return self
 
     """Return the Block within this Block that includes the given location
             and is at the given level. If the level specified is lower than
