@@ -51,14 +51,27 @@ class Game:
             2 <= max_depth <= 5
         """
         # Inicialización de atributos
-        self.max_depth = max_depth
-        self.num_human = num_human
-        self.random_players = random_players
-        self.smart_players = smart_players
+        # Inicializar el tablero raíz aleatoriamente
+        self.board = random_init(max_depth)
 
-        self.board = None
-        self.renderer = None
+        # Crear el renderer para el juego
+        self.renderer = Renderer(self.board)
+
+        # Inicializar los jugadores
         self.players = []
+
+        # Añadir jugadores humanos
+        for i in range(num_human):
+            self.players.append(HumanPlayer(i, COLOUR_LIST[i]))
+
+        # Añadir jugadores aleatorios
+        for i in range(random_players):
+            self.players.append(RandomPlayer(i + num_human, COLOUR_LIST[i + num_human]))
+
+        # Añadir jugadores inteligentes
+        for i, lvl in enumerate(smart_players):
+            player_id = num_human + random_players + i
+            self.players.append(SmartPlayer(player_id, COLOUR_LIST[player_id], lvl))
 
 
     def run_game(self, num_turns: int) -> None:

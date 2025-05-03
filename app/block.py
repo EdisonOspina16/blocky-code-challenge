@@ -294,32 +294,29 @@ class Block:
 
         L[0][0] represents the unit cell in the upper left corner of the Block.
         """
+        size = 2 ** (self.max_depth - self.level)
+
+        # If this block is a leaf (no children), fill the entire grid with its color
         if not self.children:
+            return [[self.colour for _ in range(size)] for _ in range(size)]
 
-            size = 2 ** (self.max_depth - self.level)
-            return [[self.colour] * size for _ in range(size)]
-        else:
+        # Otherwise, combine the flattened representations of the 4 children
+        child_size = size // 2
+        # Asumimos que el orden de los hijos es: SW, NW, NE, SE
+        sw = self.children[0].flatten()
+        nw = self.children[1].flatten()
+        ne = self.children[2].flatten()
+        se = self.children[3].flatten()
 
-            flattened_children = [child.flatten() for child in self.children]
+        # Combine the four quadrants in the correct order
+        result = []
+        for i in range(child_size):
+            result.append(nw[i] + ne[i])  # Fila superior: NW + NE
+        for i in range(child_size):
+            result.append(sw[i] + se[i])  # Fila inferior: SW + SE
 
+        return result
 
-            upper_left = flattened_children[0]
-            upper_right = flattened_children[1]
-            lower_left = flattened_children[2]
-            lower_right = flattened_children[3]
-
-
-            top = []
-            bottom = []
-
-            for ul_row, ur_row in zip (lower_left, lower_right):
-                top.append(ul_row + ur_row)
-
-            for ll_row, lr_row in zip (lower_left,lower_right):
-                bottom.append(ll_row + lr_row)
-
-
-            return top + bottom
 
 
 
@@ -334,7 +331,19 @@ def random_init(level: int, max_depth: int) -> 'Block':
     Precondition:
         level <= max_depth
     """
-    pass
+    if level == max_depth:
+        b = Block(level, random.choice(COLOUR_LIST))
+        b.max_depth = max_depth
+        return b
+
+    if random.random() < 0.7:
+        children = [random_init(level + 1, max_depth) for _ in range(4)]
+        b = Block(level, children=children)
+    else:
+        b = Block(level, random.choice(COLOUR_LIST))
+
+    b.max_depth = max_depth
+    return b
 
 
 def attributes_str(b: Block, verbose) -> str:
@@ -442,3 +451,4 @@ if __name__ == '__main__':
     print("\n=== random tree ===")
     # All attributes should have sensible values when we print this tree.
     print_block(b2, True)
+
