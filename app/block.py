@@ -98,7 +98,7 @@ class Block:
             self.colour = None
             for child in self.children:
                 child. parent = self
-                child.level = level +1
+                child.level = level + 1
                 child.max_depth = self.max_depth
 
         else:
@@ -192,11 +192,12 @@ class Block:
             x, y = top_left
             child_size = size // 2
 
+            #posiciona y ordena los sub bloques dentro del bloque original
             positions = [
-                (x + child_size, y),  # upper-right
-                (x, y),  # upper-left
-                (x, y + child_size),  # lower-left
-                (x + child_size, y + child_size)  # lower-right
+                (x + child_size, y),  # arriba a la derecha
+                (x, y),  # arriba a la izquierda
+                (x, y + child_size), # inferior izquierda
+                (x + child_size, y + child_size)  #esquina inferior derecha.
             ]
 
             for i in range(4):
