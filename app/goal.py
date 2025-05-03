@@ -12,7 +12,7 @@ This file contains the Goal class hierarchy.
 """
 
 from typing import List, Tuple
-from block import Block
+from app.block import Block
 
 
 class Goal:

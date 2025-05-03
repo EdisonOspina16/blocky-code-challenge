@@ -12,7 +12,7 @@ This file contains the Block class, the main data structure used in the game.
 """
 from typing import Optional, Tuple, List
 import random
-from renderer import COLOUR_LIST, TEMPTING_TURQUOISE, BLACK, colour_name
+from app.renderer import COLOUR_LIST, TEMPTING_TURQUOISE, BLACK, colour_name
 
 
 HIGHLIGHT_COLOUR = TEMPTING_TURQUOISE
@@ -73,10 +73,7 @@ class Block:
 
     def __init__(self, level: int,
                  colour: Optional[Tuple[int, int, int]] = None,
-                 children: Optional[List['Block']] = None,
-                 position: Tuple[int, int] = (0, 0),
-                 size: int = 100) -> None:
-
+                 children: Optional[List['Block']] = None) -> None:
         """Initialize this Block to be an unhighlighted root block with
         no parent.
 
@@ -86,8 +83,8 @@ class Block:
         and max_depth) to 0.  (All attributes can be updated later, as
         appropriate.)
         """
-        self.position = position
-        self.size = size
+        self.position = (0,0)
+        self.size = 0
         self.level = level
         self.max_depth = 0
         self.highlighted = False
@@ -98,17 +95,17 @@ class Block:
             self.colour = None
             for child in self.children:
                 child. parent = self
-                child.level = level +1
+                child.level = level + 1
                 child.max_depth = self.max_depth
 
-        else:                     #el else debe ir alineado con el if
+        else:
             self.children = []
             self.colour = colour
 
     def rectangles_to_draw(self) -> List[Tuple[Tuple[int, int, int],
-                                               Tuple[int, int],
-                                               Tuple[int, int],
-                                               int]]:
+                                        Tuple[int, int],
+                                        Tuple[int, int],
+                                        int]]:
         """
         Return a list of tuples describing all of the rectangles to be drawn
         in order to render this Block.
@@ -116,7 +113,7 @@ class Block:
         This includes (1) for every undivided Block:
             - one rectangle in the Block's colour
             - one rectangle in the FRAME_COLOUR to frame it at the same
-              dimensions, but with a specified thickness of 3
+            dimensions, but with a specified thickness of 3
         and (2) one additional rectangle to frame this Block in the
         HIGHLIGHT_COLOUR at a thickness of 5 if this block has been
         selected for action, that is, if its highlighted attribute is True.
@@ -126,16 +123,35 @@ class Block:
         - the colour of the rectangle
         - the (x, y) coordinates of the top left corner of the rectangle
         - the (height, width) of the rectangle, which for our Blocky game
-          will always be the same
+        will always be the same
         - an int indicating how to render this rectangle. If 0 is specified
-          the rectangle will be filled with its colour. If > 0 is specified,
-          the rectangle will not be filled, but instead will be outlined in
-          the FRAME_COLOUR, and the value will determine the thickness of
-          the outline.
+        the rectangle will be filled with its colour. If > 0 is specified,
+        the rectangle will not be filled, but instead will be outlined in
+        the FRAME_COLOUR, and the value will determine the thickness of
+        the outline.
 
         The order of the rectangles does not matter.
         """
-        pass
+        rectangles = []
+
+        if not self.children:
+            rectangles.append(
+                (self.colour, self.position, (self.size, self.size), 0)
+            )
+
+            rectangles.append(
+                (FRAME_COLOUR, self.position, (self.size, self.size), 3)
+            )
+        else:
+            for child in self.children:
+                rectangles.extend(child.rectangles_to_draw())
+
+        if self.highlighted:
+            rectangles.append(
+                (HIGHLIGHT_COLOUR, self.position, (self.size, self.size), 5)
+            )
+
+        return rectangles
 
     def swap(self, direction: int) -> None:
         """Swap the child Blocks of this Block.
@@ -143,46 +159,72 @@ class Block:
         If <direction> is 1, swap vertically.  If <direction> is 0, swap
         horizontally. If this Block has no children, do nothing.
         """
-        pass
+        if len(self.children) != 4:
+            return
+
+        if direction == 0:
+            self.children[0], self.children[1] = self.children[1], self.children[0]
+            self.children[2], self.children[3] = self.children[3], self.children[2]
+
+        elif direction == 1:
+            self.children[0], self.children[3] = self.children[3], self.children[0]
+            self.children[1], self.children[2] = self.children[2], self.children[1]
+
+        self.update_block_locations(self.position, self.size)
 
     def rotate(self, direction: int) -> None:
-        """Rotate this Block and all its descendants.
+        """Rota este Bloque y todos sus descendientes.
 
-        If <direction> is 1, rotate clockwise.  If <direction> is 3, rotate
-        counterclockwise. If this Block has no children, do nothing.
+        Si <direction> es 1, rota en sentido horario. Si <direction> es 3, rota
+        en sentido antihorario. Si este Bloque no tiene hijos, no hagas nada.
+
         """
-        pass
+        if len(self.children) != 4:
+            return
+        if direction == 1:
+            self.children = [self.children[1], self.children[2], self.children[3], self.children[0]]
+        elif direction == 3:
+            self.children = [self.children[3], self.children[0], self.children[1], self.children[2]]
+        for child in self.children:
+            child.rotate(direction)
+        self.update_block_locations(self.position, self.size)
 
     def smash(self) -> bool:
-        """Smash this block.
+        """Destruye este bloque.
 
-        If this Block can be smashed,
-        randomly generating four new child Blocks for it.  (If it already
-        had child Blocks, discard them.)
-        Ensure that the RI's of the Blocks remain satisfied.
+        Si este Bloque puede ser destruido,
+        genera aleatoriamente cuatro nuevos Bloques hijos para él. (Si ya tenía
+        Bloques hijos, descártalos).
+        Asegúrate de que se mantengan satisfechas las Invariantes de Representación (RI) de los Bloques.
 
-        A Block can be smashed iff it is not the top-level Block and it
-        is not already at the level of the maximum depth.
+        Un Bloque puede ser destruido si y solo si no es el Bloque de nivel superior y
+        no está ya en el nivel de profundidad máxima.
 
-        Return True if this Block was smashed and False otherwise.
+        Devuelve True si este Bloque fue destruido y False en caso contrario.
+
         """
-        pass
+        if self.level == 0 or self.level == self.max_depth:
+            return False
+        self.children = [random_init(self.level + 1, self.max_depth) for _ in range(4)]
+        for child in self.children:
+            child.parent = self
+        self.colour = None
+        self.update_block_locations(self.position, self.size)
+        return True
+
 
     def update_block_locations(self, top_left: Tuple[int, int], size: int) -> None:
         self.position = top_left  #Actualizamos la posicion y bloque actual
         self.size = size
-
-        if self.children:
+        if len(self.children):
             x, y = top_left
             child_size = size // 2
-
             positions = [
-                (x + child_size, y),  # upper-right
-                (x, y),  # upper-left
-                (x, y + child_size),  # lower-left
-                (x + child_size, y + child_size)  # lower-right
+                (x + child_size, y),  # arriba a la derecha
+                (x, y),  # arriba a la izquierda
+                (x, y + child_size), # inferior izquierda
+                (x + child_size, y + child_size)  #esquina inferior derecha.
             ]
-
             for i in range(4):
                 self.children[i].update_block_locations(positions[i], child_size)
 
@@ -196,30 +238,32 @@ class Block:
         this Block.  <size> is the height and width of this Block.
         """
 
-    def get_selected_block(self, location: Tuple[int, int], level: int) -> Optional['Block']:
+    def get_selected_block(self, location: Tuple[int, int], level: int) -> "Block":
         """
         Returns the block at the specified location and level, or raises an error
         if the location is outside the limits of the block.
         """
         x, y = location
 
-        # Verificar si la ubicación está dentro de los límites del bloque actual
+        # Verificar si la ubicación (x, y) está dentro de los límites del bloque actual.
         if not (self.position[0] <= x < self.position[0] + self.size and
                 self.position[1] <= y < self.position[1] + self.size):
-            raise ValueError("la ubicación está fuera de los límites")
-
-        # Si el nivel coincide, devolver este bloque
-        if level == self.level:
             return self
 
-        # Buscar en los sub-bloques si no es el nivel adecuado
-        for sub_block in self.children:
-            result = sub_block.get_selected_block(location, level)
-            if result:
-                return result
+        # Si estamos en el nivel deseado o no hay hijos, retornar este bloque
+        if self.level == level or not self.children:
+            return self
 
-        # Si no se encuentra el bloque, devolver None
-        return None
+        # Buscar entre los sub-bloques
+        for child in self.children:
+            # Verificar si (x, y) está dentro de los límites del hijo actual
+            if (child.position[0] <= x < child.position[0] + child.size and
+                    child.position[1] <= y < child.position[1] + child.size):
+                # Llamada recursiva sobre el hijo que contiene el punto
+                return child.get_selected_block(location, level)
+
+        # Si no se encuentra un hijo que contenga la ubicación, retornar este bloque
+        return self
 
     """Return the Block within this Block that includes the given location
             and is at the given level. If the level specified is lower than
