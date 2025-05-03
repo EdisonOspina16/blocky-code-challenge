@@ -182,11 +182,10 @@ class Block:
         if len(self.children) != 4:
             return
         if direction == 1:
-            self.children = [self.children[1], self.children[2], self.children[3], self.children[0]]
-        elif direction == 3:
             self.children = [self.children[3], self.children[0], self.children[1], self.children[2]]
-        for child in self.children:
-            child.rotate(direction)
+        elif direction == 3:
+            self.children = [self.children[1], self.children[2], self.children[3], self.children[0]]
+
         self.update_block_locations(self.position, self.size)
 
     def smash(self) -> bool:
@@ -208,6 +207,7 @@ class Block:
         self.children = [random_init(self.level + 1, self.max_depth) for _ in range(4)]
         for child in self.children:
             child.parent = self
+            child.max_depth = self.max_depth
         self.colour = None
         self.update_block_locations(self.position, self.size)
         return True
