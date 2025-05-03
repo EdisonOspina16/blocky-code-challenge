@@ -50,7 +50,16 @@ class Game:
         Precondition:
             2 <= max_depth <= 5
         """
-        pass
+        # Inicialización de atributos
+        self.max_depth = max_depth
+        self.num_human = num_human
+        self.random_players = random_players
+        self.smart_players = smart_players
+
+        self.board = None
+        self.renderer = None
+        self.players = []
+
 
     def run_game(self, num_turns: int) -> None:
         """Run the game for the number of turns specified.

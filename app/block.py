@@ -73,10 +73,7 @@ class Block:
 
     def __init__(self, level: int,
                  colour: Optional[Tuple[int, int, int]] = None,
-                 children: Optional[List['Block']] = None,
-                 position: Tuple[int, int] = (0, 0),
-                 size: int = 100) -> None:
-
+                 children: Optional[List['Block']] = None) -> None:
         """Initialize this Block to be an unhighlighted root block with
         no parent.
 
@@ -86,8 +83,8 @@ class Block:
         and max_depth) to 0.  (All attributes can be updated later, as
         appropriate.)
         """
-        self.position = position
-        self.size = size
+        self.position = (0,0)
+        self.size = 0
         self.level = level
         self.max_depth = 0
         self.highlighted = False
@@ -98,7 +95,7 @@ class Block:
             self.colour = None
             for child in self.children:
                 child. parent = self
-                child.level = level +1
+                child.level = level + 1
                 child.max_depth = self.max_depth
 
         else:
@@ -136,24 +133,24 @@ class Block:
         The order of the rectangles does not matter.
         """
         rectangles = []
-        
+
         if not self.children:
             rectangles.append(
                 (self.colour, self.position, (self.size, self.size), 0)
             )
-            
+
             rectangles.append(
                 (FRAME_COLOUR, self.position, (self.size, self.size), 3)
             )
         else:
             for child in self.children:
                 rectangles.extend(child.rectangles_to_draw())
-        
+
         if self.highlighted:
             rectangles.append(
                 (HIGHLIGHT_COLOUR, self.position, (self.size, self.size), 5)
             )
-        
+
         return rectangles
 
     def swap(self, direction: int) -> None:
@@ -164,22 +161,23 @@ class Block:
         """
         if len(self.children) != 4:
             return
-        
+
         if direction == 0:
             self.children[0], self.children[1] = self.children[1], self.children[0]
             self.children[2], self.children[3] = self.children[3], self.children[2]
-        
+
         elif direction == 1:
             self.children[0], self.children[3] = self.children[3], self.children[0]
             self.children[1], self.children[2] = self.children[2], self.children[1]
-        
+
         self.update_block_locations(self.position, self.size)
 
     def rotate(self, direction: int) -> None:
-        """Rotate this Block and all its descendants.
+        """Rota este Bloque y todos sus descendientes.
 
-        If <direction> is 1, rotate clockwise.  If <direction> is 3, rotate
-        counterclockwise. If this Block has no children, do nothing.
+        Si <direction> es 1, rota en sentido horario. Si <direction> es 3, rota
+        en sentido antihorario. Si este Bloque no tiene hijos, no hagas nada.
+
         """
         if len(self.children) != 4:
             return
@@ -192,17 +190,18 @@ class Block:
         self.update_block_locations(self.position, self.size)
 
     def smash(self) -> bool:
-        """Smash this block.
+        """Destruye este bloque.
 
-        If this Block can be smashed,
-        randomly generating four new child Blocks for it.  (If it already
-        had child Blocks, discard them.)
-        Ensure that the RI's of the Blocks remain satisfied.
+        Si este Bloque puede ser destruido,
+        genera aleatoriamente cuatro nuevos Bloques hijos para él. (Si ya tenía
+        Bloques hijos, descártalos).
+        Asegúrate de que se mantengan satisfechas las Invariantes de Representación (RI) de los Bloques.
 
-        A Block can be smashed iff it is not the top-level Block and it
-        is not already at the level of the maximum depth.
+        Un Bloque puede ser destruido si y solo si no es el Bloque de nivel superior y
+        no está ya en el nivel de profundidad máxima.
 
-        Return True if this Block was smashed and False otherwise.
+        Devuelve True si este Bloque fue destruido y False en caso contrario.
+
         """
         if self.level == 0 or self.level == self.max_depth:
             return False
@@ -217,18 +216,15 @@ class Block:
     def update_block_locations(self, top_left: Tuple[int, int], size: int) -> None:
         self.position = top_left  #Actualizamos la posicion y bloque actual
         self.size = size
-
-        if self.children:
+        if len(self.children):
             x, y = top_left
             child_size = size // 2
-
             positions = [
-                (x + child_size, y),  # upper-right
-                (x, y),  # upper-left
-                (x, y + child_size),  # lower-left
-                (x + child_size, y + child_size)  # lower-right
+                (x + child_size, y),  # arriba a la derecha
+                (x, y),  # arriba a la izquierda
+                (x, y + child_size), # inferior izquierda
+                (x + child_size, y + child_size)  #esquina inferior derecha.
             ]
-
             for i in range(4):
                 self.children[i].update_block_locations(positions[i], child_size)
 
