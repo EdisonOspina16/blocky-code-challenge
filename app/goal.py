@@ -61,16 +61,40 @@ class BlobGoal(Goal):
 
         <board> is the flattened board on which to search for the blob.
         <visited> is a parallel structure that, in each cell, contains:
-           -1  if this cell has never been visited
+        -1  if this cell has never been visited
             0  if this cell has been visited and discovered
-               not to be of the target colour
+            not to be of the target colour
             1  if this cell has been visited and discovered
-               to be of the target colour
+            to be of the target colour
 
         Update <visited> so that all cells that are visited are marked with
         either 0 or 1.
         """
-        pass
+        row, col = pos
+        if row < 0 or row >= len(board) or col < 0 or col >= len(board[0]):
+            return 0
+        
+        if visited[row][col] != -1:
+            return 0
+        
+        if board[row][col] != self.colour:
+            visited[row][col] = 0  
+            return 0
+        
+        visited[row][col] = 1
+        
+        blob_size = 1
+        
+        # Up
+        blob_size += self._undiscovered_blob_size((row - 1, col), board, visited)
+        # Down
+        blob_size += self._undiscovered_blob_size((row + 1, col), board, visited)
+        # Left
+        blob_size += self._undiscovered_blob_size((row, col - 1), board, visited)
+        # Right
+        blob_size += self._undiscovered_blob_size((row, col + 1), board, visited)
+        
+        return blob_size
 
 
 if __name__ == '__main__':

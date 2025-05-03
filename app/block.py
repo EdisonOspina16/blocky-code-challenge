@@ -216,19 +216,15 @@ class Block:
     def update_block_locations(self, top_left: Tuple[int, int], size: int) -> None:
         self.position = top_left  #Actualizamos la posicion y bloque actual
         self.size = size
-
-        if self.children:
+        if len(self.children):
             x, y = top_left
             child_size = size // 2
-
-            #posiciona y ordena los sub bloques dentro del bloque original
             positions = [
                 (x + child_size, y),  # arriba a la derecha
                 (x, y),  # arriba a la izquierda
                 (x, y + child_size), # inferior izquierda
                 (x + child_size, y + child_size)  #esquina inferior derecha.
             ]
-
             for i in range(4):
                 self.children[i].update_block_locations(positions[i], child_size)
 
