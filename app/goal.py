@@ -73,18 +73,18 @@ class BlobGoal(Goal):
         row, col = pos
         if row < 0 or row >= len(board) or col < 0 or col >= len(board[0]):
             return 0
-        
+
         if visited[row][col] != -1:
             return 0
-        
+
         if board[row][col] != self.colour:
-            visited[row][col] = 0  
+            visited[row][col] = 0
             return 0
-        
+
         visited[row][col] = 1
-        
+
         blob_size = 1
-        
+
         # Up
         blob_size += self._undiscovered_blob_size((row - 1, col), board, visited)
         # Down
@@ -93,8 +93,12 @@ class BlobGoal(Goal):
         blob_size += self._undiscovered_blob_size((row, col - 1), board, visited)
         # Right
         blob_size += self._undiscovered_blob_size((row, col + 1), board, visited)
-        
+
         return blob_size
+
+
+class PerimeterGoal:
+    pass
 
 
 if __name__ == '__main__':
@@ -106,7 +110,3 @@ if __name__ == '__main__':
         ],
         'max-attributes': 15
     })
-
-
-class PerimeterGoal:
-    pass

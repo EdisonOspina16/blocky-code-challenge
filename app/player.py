@@ -198,6 +198,14 @@ class HumanPlayer(Player):
                     return 0
 
 
+class RandomPlayer:
+    pass
+
+
+class SmartPlayer:
+    pass
+
+
 if __name__ == '__main__':
     import python_ta
     python_ta.check_all(config={
@@ -210,11 +218,3 @@ if __name__ == '__main__':
         'max-attributes': 10,
         'generated-members': 'pygame.*'
     })
-
-
-class RandomPlayer:
-    pass
-
-
-class SmartPlayer:
-    pass
