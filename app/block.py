@@ -106,9 +106,9 @@ class Block:
             self.colour = colour
 
     def rectangles_to_draw(self) -> List[Tuple[Tuple[int, int, int],
-                                               Tuple[int, int],
-                                               Tuple[int, int],
-                                               int]]:
+                                        Tuple[int, int],
+                                        Tuple[int, int],
+                                        int]]:
         """
         Return a list of tuples describing all of the rectangles to be drawn
         in order to render this Block.
@@ -116,7 +116,7 @@ class Block:
         This includes (1) for every undivided Block:
             - one rectangle in the Block's colour
             - one rectangle in the FRAME_COLOUR to frame it at the same
-              dimensions, but with a specified thickness of 3
+            dimensions, but with a specified thickness of 3
         and (2) one additional rectangle to frame this Block in the
         HIGHLIGHT_COLOUR at a thickness of 5 if this block has been
         selected for action, that is, if its highlighted attribute is True.
@@ -126,16 +126,35 @@ class Block:
         - the colour of the rectangle
         - the (x, y) coordinates of the top left corner of the rectangle
         - the (height, width) of the rectangle, which for our Blocky game
-          will always be the same
+        will always be the same
         - an int indicating how to render this rectangle. If 0 is specified
-          the rectangle will be filled with its colour. If > 0 is specified,
-          the rectangle will not be filled, but instead will be outlined in
-          the FRAME_COLOUR, and the value will determine the thickness of
-          the outline.
+        the rectangle will be filled with its colour. If > 0 is specified,
+        the rectangle will not be filled, but instead will be outlined in
+        the FRAME_COLOUR, and the value will determine the thickness of
+        the outline.
 
         The order of the rectangles does not matter.
         """
-        pass
+        rectangles = []
+        
+        if not self.children:
+            rectangles.append(
+                (self.colour, self.position, (self.size, self.size), 0)
+            )
+            
+            rectangles.append(
+                (FRAME_COLOUR, self.position, (self.size, self.size), 3)
+            )
+        else:
+            for child in self.children:
+                rectangles.extend(child.rectangles_to_draw())
+        
+        if self.highlighted:
+            rectangles.append(
+                (HIGHLIGHT_COLOUR, self.position, (self.size, self.size), 5)
+            )
+        
+        return rectangles
 
     def swap(self, direction: int) -> None:
         """Swap the child Blocks of this Block.
@@ -143,7 +162,18 @@ class Block:
         If <direction> is 1, swap vertically.  If <direction> is 0, swap
         horizontally. If this Block has no children, do nothing.
         """
-        pass
+        if len(self.children) != 4:
+            return
+        
+        if direction == 0:
+            self.children[0], self.children[1] = self.children[1], self.children[0]
+            self.children[2], self.children[3] = self.children[3], self.children[2]
+        
+        elif direction == 1:
+            self.children[0], self.children[3] = self.children[3], self.children[0]
+            self.children[1], self.children[2] = self.children[2], self.children[1]
+        
+        self.update_block_locations(self.position, self.size)
 
     def rotate(self, direction: int) -> None:
         """Rotate this Block and all its descendants.
