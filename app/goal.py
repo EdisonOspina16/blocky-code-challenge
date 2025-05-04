@@ -129,7 +129,32 @@ class BlobGoal(Goal):
 
 
 class PerimeterGoal(Goal):
-    pass
+
+    def score(self, board: Block) -> int:
+        flattened = board.flatten()
+        n = len(flattened)
+        score = 0
+
+        # Check top and bottom edges (including corners)
+        for j in range(n):
+            if flattened[0][j] == self.colour:
+                score += 2 if j == 0 or j == n - 1 else 1
+            if flattened[n - 1][j] == self.colour:
+                score += 2 if j == 0 or j == n - 1 else 1
+
+        # Check left and right edges (excluding corners to avoid double-counting)
+        for i in range(1, n - 1):
+            if flattened[i][0] == self.colour:
+                score += 1
+            if flattened[i][n - 1] == self.colour:
+                score += 1
+
+        return score
+
+    def description(self) -> str:
+        """Explica el objetivo en español.
+        """
+        return f"Poner la mayor cantidad de celdas {self.colour} en el borde del tablero. Las esquinas valen doble puntos."
 
 
 if __name__ == '__main__':
