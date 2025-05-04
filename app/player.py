@@ -301,6 +301,19 @@ class SmartPlayer(Player):
 
         return 0
 
+    def _choose_random_block(self, board: Block) -> Block:
+        """Selecciona un bloque aleatorio en el tablero."""
+        max_depth = min(board.max_depth, 3)  # Limita la profundidad máxima
+        depth = random.randint(0, max_depth)
+
+        current = board
+        for _ in range(depth):
+            if not current.children:  # Si es una hoja, terminar
+                break
+            current = random.choice(current.children)
+
+        return current
+
 
 if __name__ == '__main__':
     import python_ta
