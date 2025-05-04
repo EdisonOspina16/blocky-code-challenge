@@ -296,26 +296,26 @@ class Block:
         """
         size = 2 ** (self.max_depth - self.level)
 
-        # If this block is a leaf (no children), fill the entire grid with its color
+        # Si el bloque es una hoja (sin hijos), retorna una matriz de su color
         if not self.children:
             return [[self.colour for _ in range(size)] for _ in range(size)]
 
-        # Otherwise, combine the flattened representations of the 4 children
         child_size = size // 2
-        # Asumimos que el orden de los hijos es: SW, NW, NE, SE
-        sw = self.children[0].flatten()
-        nw = self.children[1].flatten()
-        ne = self.children[2].flatten()
-        se = self.children[3].flatten()
 
-        # Combine the four quadrants in the correct order
-        result = []
-        for i in range(child_size):
-            result.append(nw[i] + ne[i])  # Fila superior: NW + NE
-        for i in range(child_size):
-            result.append(sw[i] + se[i])  # Fila inferior: SW + SE
+        # Obtenemos los cuadrantes (nombres explícitos)
+        superior_izquierdo = self.children[1].flatten()  # NW
+        superior_derecho = self.children[2].flatten()  # NE
+        inferior_izquierdo = self.children[0].flatten()  # SW
+        inferior_derecho = self.children[3].flatten()  # SE
 
-        return result
+        # Combinamos los cuadrantes
+        resultado = []
+        for i in range(child_size):
+            resultado.append(superior_izquierdo[i] + superior_derecho[i])  # Parte superior
+        for i in range(child_size):
+            resultado.append(inferior_izquierdo[i] + inferior_derecho[i])  # Parte inferior
+
+        return resultado
 
 
 
