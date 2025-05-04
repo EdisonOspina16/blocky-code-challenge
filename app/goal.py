@@ -97,7 +97,7 @@ class BlobGoal(Goal):
         return blob_size
 
 
-class PerimeterGoal:
+class PerimeterGoal(Goal):
     pass
 
 
