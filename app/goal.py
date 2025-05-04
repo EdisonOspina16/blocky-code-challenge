@@ -96,6 +96,37 @@ class BlobGoal(Goal):
 
         return blob_size
 
+    def score(self, board: Block) -> int:
+        """Return the current score for this goal on the given board.
+
+        The score is the size of the largest connected blob of the goal's
+        target colour.
+        """
+        # Flatten the board for easier blob detection
+        flattened = board.flatten()
+        n = len(flattened)
+
+        # Create a parallel visited structure initialized with -1
+        visited = [[-1 for _ in range(n)] for _ in range(n)]
+
+        max_blob_size = 0
+
+        # Check every cell in the flattened board
+        for i in range(n):
+            for j in range(n):
+                # Only process unvisited cells
+                if visited[i][j] == -1:
+                    # Get the blob size starting from this cell
+                    blob_size = self._undiscovered_blob_size((i, j), flattened, visited)
+                    max_blob_size = max(max_blob_size, blob_size)
+
+        return max_blob_size
+
+    def description(self) -> str:
+        """Return a description of this goal.
+        """
+        return f"Create the largest blob of {self.colour} cells."
+
 
 class PerimeterGoal(Goal):
     pass
