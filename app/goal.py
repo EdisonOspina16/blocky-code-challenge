@@ -98,7 +98,12 @@ class BlobGoal(Goal):
 
 
 class PerimeterGoal(Goal):
-    pass
+
+
+    def description(self) -> str:
+        """Return a description of this goal.
+        """
+        return f"Put as many {self.colour} cells as possible on the perimeter. Corner cells count twice."
 
 
 if __name__ == '__main__':
