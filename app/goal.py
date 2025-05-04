@@ -96,40 +96,40 @@ class BlobGoal(Goal):
 
         return blob_size
 
-
-class PerimeterGoal(Goal):
-    """A goal to put as many of the target colour cells as possible on the
-    perimeter of the board.
-
-    Cells on corners count twice towards the score.
-    """
-
     def score(self, board: Block) -> int:
+        """Return the current score for this goal on the given board.
+
+        The score is the size of the largest connected blob of the goal's
+        target colour.
+        """
+        # Flatten the board for easier blob detection
         flattened = board.flatten()
         n = len(flattened)
-        score = 0
 
-        # Check top and bottom edges (including corners)
-        for j in range(n):
-            if flattened[0][j] == self.colour:
-                score += 2 if j == 0 or j == n - 1 else 1
-            if flattened[n - 1][j] == self.colour:
-                score += 2 if j == 0 or j == n - 1 else 1
+        # Create a parallel visited structure initialized with -1
+        visited = [[-1 for _ in range(n)] for _ in range(n)]
 
-        # Check left and right edges (excluding corners to avoid double-counting)
-        for i in range(1, n - 1):
-            if flattened[i][0] == self.colour:
-                score += 1
-            if flattened[i][n - 1] == self.colour:
-                score += 1
+        max_blob_size = 0
 
-        return score
+        # Check every cell in the flattened board
+        for i in range(n):
+            for j in range(n):
+                # Only process unvisited cells
+                if visited[i][j] == -1:
+                    # Get the blob size starting from this cell
+                    blob_size = self._undiscovered_blob_size((i, j), flattened, visited)
+                    max_blob_size = max(max_blob_size, blob_size)
 
+        return max_blob_size
 
     def description(self) -> str:
-        """Explica el objetivo en español.
+        """Return a description of this goal.
         """
-        return f"Poner la mayor cantidad de celdas {self.colour} en el borde del tablero. Las esquinas valen doble puntos."
+        return f"Create the largest blob of {self.colour} cells."
+
+
+class PerimeterGoal(Goal):
+    pass
 
 
 if __name__ == '__main__':

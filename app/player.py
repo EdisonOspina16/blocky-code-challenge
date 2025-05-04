@@ -199,13 +199,123 @@ class HumanPlayer(Player):
 
 
 class RandomPlayer(Player):
-    pass
+    """A computer player that moves randomly.
+
+    === Public Attributes ===
+    renderer:
+        The object that draws our Blocky board on the screen
+        and tracks user interactions with the Blocky board.
+    id:
+        This player's number.  Used by the renderer to refer to the player,
+        for example as "Player 2"
+    goal:
+        This player's assigned goal for the game.
+    """
+
+    def make_move(self, board: Block) -> int:
+        """Choose a random move to make on the given board, and apply it, 
+        mutating the Board as appropriate.
+
+        Return 0 upon successful completion of a move, and 1 upon a QUIT event.
+        """
+        # Choose a random block on the board
+        random_block = self._choose_random_block(board)
+
+        # Highlight the selected block and draw the board
+        random_block.highlighted = True
+        self.renderer.draw(board, self.id)
+
+        # Pause for a moment so the user can see the selected block
+        pygame.time.wait(TIME_DELAY)
+
+        # Choose a random action
+        action_type = random.randint(0, 4)
+
+        # Apply the chosen action
+        if action_type == 0:
+            # Rotate clockwise
+            random_block.rotate(1)
+        elif action_type == 1:
+            # Rotate counter-clockwise
+            random_block.rotate(3)
+        elif action_type == 2:
+            # Swap horizontally
+            random_block.swap(0)
+        elif action_type == 3:
+            # Swap vertically
+            random_block.swap(1)
+        else:
+            # Smash the block
+            random_block.smash()
+
+        # Un-highlight the block and redraw the board
+        random_block.highlighted = False
+        self.renderer.draw(board, self.id)
+
+        return 0
+
+    def _choose_random_block(self, board: Block) -> Block:
+        """Choose a random block on the board."""
+        max_depth = board.max_depth
+        
+        # Random depth level (not going too deep to avoid tiny blocks)
+        depth = random.randint(0, max_depth - 1)
+        
+        # Start at the top level
+        curr_block = board
+        curr_depth = 0
+        
+        # Go down the tree until we reach the desired depth or a leaf
+        while curr_depth < depth and len(curr_block.children) > 0:
+            curr_block = random.choice(curr_block.children)
+            curr_depth += 1
+            
+        return curr_block
 
 
 class SmartPlayer(Player):
+    """A computer player that chooses intelligent moves.
 
+       A SmartPlayer looks ahead to determine the best move based on their goal.
+       The difficulty level determines how many moves it evaluates.
+       A SmartPlayer cannot perform smash moves.
 
+       === Public Attributes ===
+       renderer:
+           The object that draws our Blocky board on the screen
+           and tracks user interactions with the Blocky board.
+       id:
+           This player's number.  Used by the renderer to refer to the player,
+           for example as "Player 2"
+       goal:
+           This player's assigned goal for the game.
+       difficulty:
+           How many moves this player considers before choosing one.
+       """
 
+    # === Private Attributes ===
+    # _difficulty_moves_map:
+    #     A dictionary mapping difficulty levels to number of moves to consider
+    _difficulty_moves_map: dict[int, int]
+    difficulty: int
+
+    def _init_(self, renderer: Renderer, player_id: int, goal: Goal,
+               difficulty: int) -> None:
+        """Initialize this SmartPlayer with the given <renderer>, <player_id>,
+        <goal>, and <difficulty>.
+        """
+        super()._init_(renderer, player_id, goal)
+        self.difficulty = difficulty
+
+        # Initialize the difficulty to moves map
+        self._difficulty_moves_map = {
+            0: 5,
+            1: 10,
+            2: 25,
+            3: 50,
+            4: 100,
+            5: 150
+        }
 
     def make_move(self, board: Block) -> int:
         """Choose the best move to make on the given board, and apply it,
