@@ -102,6 +102,7 @@ class Block:
             self.children = []
             self.colour = colour
 
+
     def rectangles_to_draw(self) -> List[Tuple[Tuple[int, int, int],
                                         Tuple[int, int],
                                         Tuple[int, int],
@@ -182,11 +183,12 @@ class Block:
         if len(self.children) != 4:
             return
         if direction == 1:
-            self.children = [self.children[3], self.children[0], self.children[1], self.children[2]]
-        elif direction == 3:
             self.children = [self.children[1], self.children[2], self.children[3], self.children[0]]
+        elif direction == 3:
+            self.children = [self.children[3], self.children[0], self.children[1], self.children[2]]
 
         self.update_block_locations(self.position, self.size)
+
 
     def smash(self) -> bool:
         """Destruye este bloque.
@@ -318,8 +320,6 @@ class Block:
         return resultado
 
 
-
-
 def random_init(level: int, max_depth: int) -> 'Block':
     """Return a randomly-generated Block with level <level> and subdivided
     to a maximum depth of <max_depth>.
@@ -447,8 +447,7 @@ if __name__ == '__main__':
     # value (3 in this case).
     b2 = random_init(0, 3)
     # Now we update position and size throughout the tree.
-    #b2.update_block_locations((0, 0), 750)
+    # b2.update_block_locations((0, 0), 750)
     print("\n=== random tree ===")
     # All attributes should have sensible values when we print this tree.
     print_block(b2, True)
-
