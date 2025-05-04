@@ -50,28 +50,38 @@ class Game:
         Precondition:
             2 <= max_depth <= 5
         """
-        # Inicialización de atributos
-        # Inicializar el tablero raíz aleatoriamente
-        self.board = random_init(max_depth)
+        total_players = num_human + random_players + len(smart_players)
 
-        # Crear el renderer para el juego
-        self.renderer = Renderer(self.board)
+        # Crear el tablero inicial
+        self.board = random_init(0, max_depth)
 
-        # Inicializar los jugadores
+        # Crear el renderer (sin draw todavía)
+        self.renderer = Renderer(total_players)
+
         self.players = []
 
-        # Añadir jugadores humanos
-        for i in range(num_human):
-            self.players.append(HumanPlayer(i, COLOUR_LIST[i]))
+        # Generar objetivos aleatorios para cada jugador
+        for i in range(total_players):
+            colour = COLOUR_LIST[i]
 
-        # Añadir jugadores aleatorios
-        for i in range(random_players):
-            self.players.append(RandomPlayer(i + num_human, COLOUR_LIST[i + num_human]))
+            # Alternar entre objetivos Blob y Perimeter
+            if random.choice([True, False]):
+                goal = BlobGoal(colour)
+            else:
+                goal = PerimeterGoal(colour)
 
-        # Añadir jugadores inteligentes
-        for i, lvl in enumerate(smart_players):
-            player_id = num_human + random_players + i
-            self.players.append(SmartPlayer(player_id, COLOUR_LIST[player_id], lvl))
+            # Crear cada jugador según el índice
+            if i < num_human:
+                player = HumanPlayer(i, colour, goal)
+            elif i < num_human + random_players:
+                player = RandomPlayer(i, colour, goal)
+            else:
+                # Calculamos el índice del jugador inteligente
+                smart_idx = i - (num_human + random_players)
+                level = smart_players[smart_idx]
+                player = SmartPlayer(i, colour, goal, level)
+
+            self.players.append(player)
 
 
     def run_game(self, num_turns: int) -> None:
