@@ -41,7 +41,7 @@ class Game:
     renderer: Renderer
     players: List[Player]
 
-    def __init__(self, max_depth: int,
+    def _init_(self, max_depth: int,
                  num_human: int,
                  random_players: int,
                  smart_players: List[int]) -> None:
@@ -50,38 +50,69 @@ class Game:
         Precondition:
             2 <= max_depth <= 5
         """
-        total_players = num_human + random_players + len(smart_players)
-
-        # Crear el tablero inicial
-        self.board = random_init(0, max_depth)
-
-        # Crear el renderer (sin draw todavía)
-        self.renderer = Renderer(total_players)
+        # Inicializar explícitamente la lista players para evitar el error
 
         self.players = []
 
-        # Generar objetivos aleatorios para cada jugador
-        for i in range(total_players):
-            colour = COLOUR_LIST[i]
+        # Calcular el número total de jugadores
+        total_players = num_human + random_players + len(smart_players)
 
-            # Alternar entre objetivos Blob y Perimeter
-            if random.choice([True, False]):
-                goal = BlobGoal(colour)
+        # Crear el renderer primero ya que los jugadores lo necesitan
+        self.renderer = Renderer(total_players)
+
+        # Inicializar el tablero aleatorio y establecer posiciones/tamaños
+        self.board = random_init(0, max_depth)
+        self.board.update_block_locations((0, 0), BOARD_WIDTH)
+
+        # Crear los jugadores humanos
+        for i in range(num_human):
+            # Elegir un color objetivo aleatorio para este jugador
+            target_colour = random.choice(COLOUR_LIST)
+
+            # Crear un objetivo aleatorio (Blob o Perimeter)
+            if random.random() < 0.5:
+                goal = BlobGoal(target_colour)
             else:
-                goal = PerimeterGoal(colour)
+                goal = PerimeterGoal(target_colour)
 
-            # Crear cada jugador según el índice
-            if i < num_human:
-                player = HumanPlayer(i, colour, goal)
-            elif i < num_human + random_players:
-                player = RandomPlayer(i, colour, goal)
-            else:
-                # Calculamos el índice del jugador inteligente
-                smart_idx = i - (num_human + random_players)
-                level = smart_players[smart_idx]
-                player = SmartPlayer(i, colour, goal, level)
-
+            # Crear y añadir el jugador humano
+            player = HumanPlayer(self.renderer, i, goal)
             self.players.append(player)
+
+        # Crear los jugadores aleatorios
+        for i in range(random_players):
+            # Elegir un color objetivo aleatorio para este jugador
+            target_colour = random.choice(COLOUR_LIST)
+
+            # Crear un objetivo aleatorio (Blob o Perimeter)
+            if random.random() < 0.5:
+                goal = BlobGoal(target_colour)
+            else:
+                goal = PerimeterGoal(target_colour)
+
+            # Crear y añadir el jugador aleatorio
+            player = RandomPlayer(self.renderer, i + num_human, goal)
+            self.players.append(player)
+
+        # Crear los jugadores inteligentes
+        for idx, difficulty in enumerate(smart_players):
+            # Elegir un color objetivo aleatorio para este jugador
+            target_colour = random.choice(COLOUR_LIST)
+
+            # Crear un objetivo aleatorio (Blob o Perimeter)
+            if random.random() < 0.5:
+                goal = BlobGoal(target_colour)
+            else:
+                goal = PerimeterGoal(target_colour)
+
+            # Crear y añadir el jugador inteligente con su nivel de dificultad
+            player_id = num_human + random_players + idx
+            player = SmartPlayer(self.renderer, player_id, goal, difficulty)
+            self.players.append(player)
+
+        # Dibujar el tablero inicial
+        if self.players:  # Verificar que haya al menos un jugador
+            self.renderer.draw(self.board, 0)
 
 
     def run_game(self, num_turns: int) -> None:
