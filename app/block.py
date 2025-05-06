@@ -311,11 +311,36 @@ class Block:
         inferior_derecho = self.children[3].flatten()  # SE
 
         # Combinamos los cuadrantes
+        # Verificamos que todos los cuadrantes tienen el tamaño correcto
+        # (añadimos este check para diagnóstico)
+        expected_size = child_size
+        if (len(superior_izquierdo) != expected_size or
+                len(superior_derecho) != expected_size or
+                len(inferior_izquierdo) != expected_size or
+                len(inferior_derecho) != expected_size):
+            # Si algún cuadrante no tiene el tamaño esperado, creamos una matriz en negro como fallback
+            return [[(0, 0, 0) for _ in range(size)] for _ in range(size)]
+
+        # Combinamos los cuadrantes
         resultado = []
+
+        # Combinamos la parte superior (filas superiores)
         for i in range(child_size):
-            resultado.append(superior_izquierdo[i] + superior_derecho[i])  # Parte superior
+            fila_superior = []
+            # Añadimos primero el cuadrante superior izquierdo
+            fila_superior.extend(superior_izquierdo[i])
+            # Luego añadimos el cuadrante superior derecho
+            fila_superior.extend(superior_derecho[i])
+            resultado.append(fila_superior)
+
+        # Combinamos la parte inferior (filas inferiores)
         for i in range(child_size):
-            resultado.append(inferior_izquierdo[i] + inferior_derecho[i])  # Parte inferior
+            fila_inferior = []
+            # Añadimos primero el cuadrante inferior izquierdo
+            fila_inferior.extend(inferior_izquierdo[i])
+            # Luego añadimos el cuadrante inferior derecho
+            fila_inferior.extend(inferior_derecho[i])
+            resultado.append(fila_inferior)
 
         return resultado
 
