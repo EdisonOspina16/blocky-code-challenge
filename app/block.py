@@ -296,7 +296,7 @@ class Block:
 
         L[0][0] represents the unit cell in the upper left corner of the Block.
         """
-        size = 2 ** (self.max_depth - self.level)
+        size = int(2 ** (self.max_depth - self.level))
 
         # Si el bloque es una hoja (sin hijos), retorna una matriz de su color
         if not self.children:
