@@ -356,15 +356,22 @@ def random_init(level: int, max_depth: int) -> 'Block':
     Precondition:
         level <= max_depth
     """
+    # Base case: if we're at maximum depth, create a leaf block
     if level == max_depth:
         b = Block(level, random.choice(COLOUR_LIST))
         b.max_depth = max_depth
         return b
 
-    if random.random() < 0.7:
+    # Decide whether to create a parent or leaf block
+    # Only create children if we're not at max_depth - 1 already
+    if level < max_depth and random.random() < 0.7:
+        # Create a parent block with 4 children
         children = [random_init(level + 1, max_depth) for _ in range(4)]
         b = Block(level, children=children)
+        for child in b.children:
+            child.parent = b
     else:
+        # Create a leaf block with a random color
         b = Block(level, random.choice(COLOUR_LIST))
 
     b.max_depth = max_depth
