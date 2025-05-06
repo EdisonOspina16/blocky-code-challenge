@@ -299,7 +299,7 @@ class SmartPlayer(Player):
     _difficulty_moves_map: dict[int, int]
     difficulty: int
 
-    def _init_(self, renderer: Renderer, player_id: int, goal: Goal,
+    def __init__(self, renderer: Renderer, player_id: int, goal: Goal,
                difficulty: int) -> None:
         """Initialize this SmartPlayer with the given <renderer>, <player_id>,
         <goal>, and <difficulty>.

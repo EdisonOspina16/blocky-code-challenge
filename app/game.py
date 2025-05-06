@@ -41,7 +41,7 @@ class Game:
     renderer: Renderer
     players: List[Player]
 
-    def _init_(self, max_depth: int,
+    def __init__(self, max_depth: int,
                  num_human: int,
                  random_players: int,
                  smart_players: List[int]) -> None:
@@ -133,11 +133,11 @@ class Game:
         index = 0
         for turn in range(num_turns * len(self.players)):
             player = self.players[index]
-            print(f'Player {player.id}, turn {turn}')
+            print(f'Player {player.id +1}, turn {turn + 1}')
             if self.players[index].make_move(self.board) == 1:
                 break
             else:
-                print(f'Player {player.id} CURRENT SCORE: ' +
+                print(f'Player {player.id + 1} CURRENT SCORE: ' +
                       f'{player.goal.score(self.board)}')
                 index = (index + 1) % len(self.players)
 
@@ -146,14 +146,14 @@ class Game:
         winning_player = 0
         for i in range(len(self.players)):
             score = self.players[i].goal.score(self.board)
-            print(f'Player {i} : {score}')
+            print(f'Player {i + 1} : {score}')
             if score > max_score:
                 max_score = score
                 winning_player = i
-        print(f'WINNER is Player {winning_player}!')
+        print(f'WINNER is Player {winning_player + 1}!')
         print('Players had these goals:')
         for player in self.players:
-            print(f'Player {player.id} ' +
+            print(f'Player {player.id + 1} ' +
                   f'goal = \n\t{player.goal.description()}: ' +
                   f'{colour_name(player.goal.colour)}')
 
@@ -192,15 +192,15 @@ def sample_game() -> None:
 
 
 if __name__ == '__main__':
-     import python_ta
-     python_ta.check_all(config={
-         'allowed-io': ['run_game'],
-         'allowed-import-modules': [
-             'doctest', 'python_ta', 'random', 'typing',
-             'block', 'goal', 'player', 'renderer'
-         ],
-     })
+    # import python_ta
+    # python_ta.check_all(config={
+    #     'allowed-io': ['run_game'],
+    #     'allowed-import-modules': [
+    #         'doctest', 'python_ta', 'random', 'typing',
+    #         'block', 'goal', 'player', 'renderer'
+    #     ],
+    # })
     # sample_game()
     # auto_game()
-     two_player_game()
+    two_player_game()
     # solitaire_game()
