@@ -304,7 +304,7 @@ class SmartPlayer(Player):
         """Initialize this SmartPlayer with the given <renderer>, <player_id>,
         <goal>, and <difficulty>.
         """
-        super()._init_(renderer, player_id, goal)
+        super().__init__(renderer, player_id, goal)
         self.difficulty = difficulty
 
         # Initialize the difficulty to moves map
