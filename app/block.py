@@ -242,9 +242,9 @@ class Block:
 
     def get_selected_block(self, location: Tuple[int, int], level: int) -> "Block":
         """
-        Actualiza la posición (esquina superior izquierda) y el tamaño del bloque actual.
-        Si el bloque tiene hijos, divide su área en cuatro sub-bloques iguales y calcula la posición y tamaño de cada uno a partir de las coordenadas del bloque padre.
-        Esto garantiza que todos los sub-bloques estén correctamente ubicados dentro de su bloque padre, manteniendo la estructura jerárquica del tablero.
+        Su objetivo es encontrar el bloque que contenga ese punto y esté en el nivel especificado.
+        Si no existe un bloque exactamente en ese nivel, devuelve el bloque más cercano en profundidad que contiene el punto.
+
         """
         x, y = location
 
