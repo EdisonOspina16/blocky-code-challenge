@@ -284,17 +284,17 @@ class Block:
             """
 
     def flatten(self) -> List[List[Tuple[int, int, int]]]:
-        """Return a two-dimensional list representing this Block as rows
-        and columns of unit cells.
+        """Devuelve una lista bidimensional que representa este Bloque como filas
+        y columnas de celdas unitarias.
 
-        Return a list of lists L, where,
-        for 0 <= i, j < 2^{max_depth - self.level}
-            - L[i] represents column i and
-            - L[i][j] represents the unit cell at column i and row j.
-        Each unit cell is represented by 3 ints for the colour
-        of the block at the cell location[i][j]
+        Devuelve una lista de listas L, donde,
+        para 0 <= i, j < 2^{max_depth - self.level}
+            - L[i] representa la columna i y
+            - L[i][j] representa la celda unitaria en la columna i y fila j.
+        Cada celda unitaria está representada por 3 enteros que indican el color
+        del bloque en la ubicación de la celda [i][j].
 
-        L[0][0] represents the unit cell in the upper left corner of the Block.
+        L[0][0] representa la celda unitaria en la esquina superior izquierda del Bloque.
         """
         size = int(2 ** (self.max_depth - self.level))
 
@@ -304,15 +304,13 @@ class Block:
 
         child_size = size // 2
 
-        # Obtenemos los cuadrantes (nombres explícitos)
-        superior_izquierdo = self.children[1].flatten()  # NW
-        superior_derecho = self.children[2].flatten()  # NE
-        inferior_izquierdo = self.children[0].flatten()  # SW
-        inferior_derecho = self.children[3].flatten()  # SE
+        # Obtenemos los cuadrantes
+        superior_izquierdo = self.children[1].flatten()
+        superior_derecho = self.children[2].flatten()
+        inferior_izquierdo = self.children[0].flatten()
+        inferior_derecho = self.children[3].flatten()
 
-        # Combinamos los cuadrantes
         # Verificamos que todos los cuadrantes tienen el tamaño correcto
-        # (añadimos este check para diagnóstico)
         expected_size = child_size
         if (len(superior_izquierdo) != expected_size or
                 len(superior_derecho) != expected_size or
@@ -324,21 +322,17 @@ class Block:
         # Combinamos los cuadrantes
         resultado = []
 
-        # Combinamos la parte superior (filas superiores)
+
         for i in range(child_size):
             fila_superior = []
-            # Añadimos primero el cuadrante superior izquierdo
             fila_superior.extend(superior_izquierdo[i])
-            # Luego añadimos el cuadrante superior derecho
             fila_superior.extend(superior_derecho[i])
             resultado.append(fila_superior)
 
-        # Combinamos la parte inferior (filas inferiores)
+
         for i in range(child_size):
             fila_inferior = []
-            # Añadimos primero el cuadrante inferior izquierdo
             fila_inferior.extend(inferior_izquierdo[i])
-            # Luego añadimos el cuadrante inferior derecho
             fila_inferior.extend(inferior_derecho[i])
             resultado.append(fila_inferior)
 
@@ -346,32 +340,31 @@ class Block:
 
 
 def random_init(level: int, max_depth: int) -> 'Block':
-    """Return a randomly-generated Block with level <level> and subdivided
-    to a maximum depth of <max_depth>.
+    """Devuelve un Bloque generado aleatoriamente con nivel <level> y subdividido
+    hasta una profundidad máxima de <max_depth>.
 
-    Throughout the generated Block, set appropriate values for all attributes
-    except position and size.  They can be set by the client, using method
-    update_block_locations.
+    En todo el Bloque generado, asigna valores apropiados para todos los atributos,
+    excepto la posición y el tamaño. Estos pueden ser establecidos por el cliente
+    utilizando el método update_block_locations.
 
-    Precondition:
+    Precondición:
         level <= max_depth
     """
-    # Base case: if we're at maximum depth, create a leaf block
+    # Caso base
     if level == max_depth:
         b = Block(level, random.choice(COLOUR_LIST))
         b.max_depth = max_depth
         return b
 
-    # Decide whether to create a parent or leaf block
-    # Only create children if we're not at max_depth - 1 already
+    # Decide si crear un bloque padre o un bloque hoja
+    # Crea bloques hijos solo si no hemos alcanzado la profundidad máxima de 1
     if level < max_depth and random.random() < 0.7:
-        # Create a parent block with 4 children
+        # Crear un bloque padre con 4 hijos
         children = [random_init(level + 1, max_depth) for _ in range(4)]
         b = Block(level, children=children)
         for child in b.children:
             child.parent = b
     else:
-        # Create a leaf block with a random color
         b = Block(level, random.choice(COLOUR_LIST))
 
     b.max_depth = max_depth

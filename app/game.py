@@ -45,12 +45,11 @@ class Game:
                  num_human: int,
                  random_players: int,
                  smart_players: List[int]) -> None:
-        """Initialize this game, as described in the Assignment 2 handout.
+        """Inicialice este juego, como se describe en la tarea 2.
 
-        Precondition:
-            2 <= max_depth <= 5
+            Condición previa:
+            2 <= profundidad máxima <= 5
         """
-        # Inicializar explícitamente la lista players para evitar el error
 
         self.players = []
 

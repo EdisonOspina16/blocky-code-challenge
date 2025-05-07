@@ -135,14 +135,14 @@ class PerimeterGoal(Goal):
         n = len(flattened)
         score = 0
 
-        # Check top and bottom edges (including corners)
+        # Verifica los bordes superior e inferior (incluidas las esquinas)
         for j in range(n):
             if flattened[0][j] == self.colour:
                 score += 2 if j == 0 or j == n - 1 else 1
             if flattened[n - 1][j] == self.colour:
                 score += 2 if j == 0 or j == n - 1 else 1
 
-        # Check left and right edges (excluding corners to avoid double-counting)
+        # Verifica los bordes izquierdo y derecho (excluyendo las esquinas para evitar el conteo doble)
         for i in range(1, n - 1):
             if flattened[i][0] == self.colour:
                 score += 1
@@ -152,9 +152,7 @@ class PerimeterGoal(Goal):
         return score
 
     def description(self) -> str:
-        """Explica el objetivo en español.
-        """
-        return f"Poner la mayor cantidad de celdas {self.colour} en el borde del tablero. Las esquinas valen doble puntos."
+        return f"Poner la mayor cantidad de celdas {self.colour} en el borde del tablero. Las esquinas valen puntos dobles."
 
 
 if __name__ == '__main__':
