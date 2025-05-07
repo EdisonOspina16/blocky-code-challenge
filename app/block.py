@@ -74,15 +74,7 @@ class Block:
     def __init__(self, level: int,
                  colour: Optional[Tuple[int, int, int]] = None,
                  children: Optional[List['Block']] = None) -> None:
-        """Initialize this Block to be an unhighlighted root block with
-        no parent.
-
-        If <children> is None, give this block no children. Otherwise
-        give it the provided children.  Use the provided level and colour,
-        and set everything else (x and y coordinates, size,
-        and max_depth) to 0.  (All attributes can be updated later, as
-        appropriate.)
-        """
+        
         self.position = (0,0)
         self.size = 0
         self.level = level
