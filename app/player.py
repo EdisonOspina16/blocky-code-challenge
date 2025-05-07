@@ -309,79 +309,60 @@ class SmartPlayer(Player):
 
         Return 0 upon successful completion of a move, and 1 upon a QUIT event.
         """
-        # Determine how many moves to consider
+
         if self.difficulty > 5:
             moves_to_consider = 150
         else:
             moves_to_consider = self._difficulty_moves_map[self.difficulty]
 
-        # Find the best move
         best_score = -1
         best_move = None
         best_block = None
 
-        # Track the current score before any moves
         current_score = self.goal.score(board)
 
-        # Try different moves to find the best one
         for _ in range(moves_to_consider):
-            # Choose a random block
             block = self._choose_random_block(board)
 
-            # Choose a random action (excluding smash)
             action_type = random.randint(0, 3)
 
-            # Create a copy of the original state to restore later
-            # For rotations, we'll need to track how many we did
-            # For swaps, we'll track the swap axis
-
-            # Apply the action
             if action_type == 0:
-                # Rotate clockwise
                 block.rotate(1)
                 move_type = "rotate_cw"
             elif action_type == 1:
-                # Rotate counter-clockwise
                 block.rotate(3)
                 move_type = "rotate_ccw"
             elif action_type == 2:
-                # Swap horizontally
                 block.swap(0)
                 move_type = "swap_h"
             else:
-                # Swap vertically
                 block.swap(1)
                 move_type = "swap_v"
 
-            # Calculate the score after this move
             new_score = self.goal.score(board)
 
-            # Check if this is better than the current best
             if new_score > best_score:
                 best_score = new_score
                 best_move = move_type
                 best_block = block
 
-            # Undo the move to restore the board
             if move_type == "rotate_cw":
-                block.rotate(3)  # Rotate counter-clockwise to undo
+                block.rotate(3)
             elif move_type == "rotate_ccw":
-                block.rotate(1)  # Rotate clockwise to undo
+                block.rotate(1)
             elif move_type == "swap_h":
-                block.swap(0)  # Swap horizontally again to undo
+                block.swap(0)
             elif move_type == "swap_v":
-                block.swap(1)  # Swap vertically again to undo
+                block.swap(1)
 
-        # Apply the best move found
+
         if best_move is not None and best_block is not None:
-            # Highlight the block we're going to modify
+
             best_block.highlighted = True
             self.renderer.draw(board, self.id)
 
-            # Pause for a moment so the user can see the selected block
             pygame.time.wait(TIME_DELAY)
 
-            # Apply the chosen best move
             if best_move == "rotate_cw":
                 best_block.rotate(1)
             elif best_move == "rotate_ccw":
@@ -391,7 +372,6 @@ class SmartPlayer(Player):
             elif best_move == "swap_v":
                 best_block.swap(1)
 
-            # Un-highlight the block and redraw the board
             best_block.highlighted = False
             self.renderer.draw(board, self.id)
 
