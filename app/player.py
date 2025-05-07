@@ -218,37 +218,26 @@ class RandomPlayer(Player):
 
         Return 0 upon successful completion of a move, and 1 upon a QUIT event.
         """
-        # Choose a random block on the board
         random_block = self._choose_random_block(board)
 
-        # Highlight the selected block and draw the board
         random_block.highlighted = True
         self.renderer.draw(board, self.id)
 
-        # Pause for a moment so the user can see the selected block
         pygame.time.wait(TIME_DELAY)
 
-        # Choose a random action
         action_type = random.randint(0, 4)
 
-        # Apply the chosen action
         if action_type == 0:
-            # Rotate clockwise
             random_block.rotate(1)
         elif action_type == 1:
-            # Rotate counter-clockwise
             random_block.rotate(3)
         elif action_type == 2:
-            # Swap horizontally
             random_block.swap(0)
         elif action_type == 3:
-            # Swap vertically
             random_block.swap(1)
         else:
-            # Smash the block
             random_block.smash()
 
-        # Un-highlight the block and redraw the board
         random_block.highlighted = False
         self.renderer.draw(board, self.id)
 
@@ -258,14 +247,11 @@ class RandomPlayer(Player):
         """Choose a random block on the board."""
         max_depth = board.max_depth
         
-        # Random depth level (not going too deep to avoid tiny blocks)
         depth = random.randint(0, max_depth - 1)
         
-        # Start at the top level
         curr_block = board
         curr_depth = 0
         
-        # Go down the tree until we reach the desired depth or a leaf
         while curr_depth < depth and len(curr_block.children) > 0:
             curr_block = random.choice(curr_block.children)
             curr_depth += 1
