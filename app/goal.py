@@ -97,11 +97,11 @@ class BlobGoal(Goal):
         return blob_size
 
     def score(self, board: Block) -> int:
-        """Return the current score for this goal on the given board.
+        """Devuelve la puntuación actual de este gol en el tablero dado.
 
-        The score is the size of the largest connected blob of the goal's
-        target colour.
+           La puntuación es el tamaño de la mancha conectada más grande del color objetivo del gol.
         """
+
         # Flatten the board for easier blob detection
         flattened = board.flatten()
         n = len(flattened)

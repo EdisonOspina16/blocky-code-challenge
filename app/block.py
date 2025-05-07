@@ -216,72 +216,52 @@ class Block:
 
 
     def update_block_locations(self, top_left: Tuple[int, int], size: int) -> None:
-        self.position = top_left  #Actualizamos la posicion y bloque actual
+        """
+        Actualice la posición y el tamaño de cada uno de los bloques dentro de este bloque.
+
+        Asegúrese de que cada uno coincida con la posición y el tamaño de su bloque principal.
+
+        <top_left> son las coordenadas (x, y) de la esquina superior izquierda de este bloque. <size> es la altura
+
+        y el ancho de este bloque.
+        """
+
+        self.position = top_left
         self.size = size
         if len(self.children):
             x, y = top_left
             child_size = size // 2
             positions = [
-                (x + child_size, y),  # arriba a la derecha
-                (x, y),  # arriba a la izquierda
-                (x, y + child_size), # inferior izquierda
-                (x + child_size, y + child_size)  #esquina inferior derecha.
+                (x + child_size, y),
+                (x, y),
+                (x, y + child_size),
+                (x + child_size, y + child_size)
             ]
             for i in range(4):
                 self.children[i].update_block_locations(positions[i], child_size)
 
-        """
-        Update the position and size of each of the Blocks within this Block.
-
-        Ensure that each is consistent with the position and size of its
-        parent Block.
-
-        <top_left> is the (x, y) coordinates of the top left corner of
-        this Block.  <size> is the height and width of this Block.
-        """
-
     def get_selected_block(self, location: Tuple[int, int], level: int) -> "Block":
         """
-        Returns the block at the specified location and level, or raises an error
-        if the location is outside the limits of the block.
+        Actualiza la posición (esquina superior izquierda) y el tamaño del bloque actual.
+        Si el bloque tiene hijos, divide su área en cuatro sub-bloques iguales y calcula la posición y tamaño de cada uno a partir de las coordenadas del bloque padre.
+        Esto garantiza que todos los sub-bloques estén correctamente ubicados dentro de su bloque padre, manteniendo la estructura jerárquica del tablero.
         """
         x, y = location
 
-        # Verificar si la ubicación (x, y) está dentro de los límites del bloque actual.
         if not (self.position[0] <= x < self.position[0] + self.size and
                 self.position[1] <= y < self.position[1] + self.size):
             return self
 
-        # Si estamos en el nivel deseado o no hay hijos, retornar este bloque
         if self.level == level or not self.children:
             return self
 
-        # Buscar entre los sub-bloques
         for child in self.children:
-            # Verificar si (x, y) está dentro de los límites del hijo actual
             if (child.position[0] <= x < child.position[0] + child.size and
                     child.position[1] <= y < child.position[1] + child.size):
-                # Llamada recursiva sobre el hijo que contiene el punto
                 return child.get_selected_block(location, level)
 
-        # Si no se encuentra un hijo que contenga la ubicación, retornar este bloque
         return self
 
-    """Return the Block within this Block that includes the given location
-            and is at the given level. If the level specified is lower than
-            the lowest block at the specified location, then return the block
-            at the location with the closest level value.
-
-            <location> is the (x, y) coordinates of the location on the window
-            whose corresponding block is to be returned.
-            <level> is the level of the desired Block.  Note that
-            if a Block includes the location (x, y), and that Block is subdivided,
-            then one of its four children will contain the location (x, y) also;
-            this is why <level> is needed.
-
-            Preconditions:
-            - 0 <= level <= max_depth
-            """
 
     def flatten(self) -> List[List[Tuple[int, int, int]]]:
         """Devuelve una lista bidimensional que representa este Bloque como filas
